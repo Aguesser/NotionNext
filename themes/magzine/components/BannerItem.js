@@ -1,5 +1,5 @@
 import { siteConfig } from '@/lib/config'
-import Link from 'next/link'
+import SmartLink from '@/components/SmartLink'
 import CONFIG from '../config'
 
 /**
@@ -27,8 +27,8 @@ export default function BannerItem() {
       <h2 className='text-2xl font-semibold'>{title}</h2>
       <h3 className='text-sm'>{description}</h3>
       {button && (
-        <div className='mt-2 text-center px-6 py-3 font-semibold rounded-3xl text-black bg-[#7BE986] hover:bg-[#62BA6B]'>
-          <Link href={url}>{text}</Link>
+        <div className='mt-2 text-center px-6 py-3 font-semibold rounded-3xl text-black hover:text-black bg-[var(--magzine-console-primary)] hover:bg-[var(--magzine-console-primary)]'>
+          <SmartLink href={url}>{text}</SmartLink>
         </div>
       )}
       <span className='text-xs'>{tips}</span>

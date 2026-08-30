@@ -33,7 +33,7 @@ const Footer = ({ siteInfo }) => {
       {siteConfig('BEI_AN') && (
         <>
           <i className='fas fa-shield-alt' />{' '}
-          <a href='https://beian.miit.gov.cn/' className='mr-2'>
+          <a href={siteConfig('BEI_AN_LINK')} className='mr-2'>
             {siteConfig('BEI_AN')}
           </a>
           <BeiAnGongAn />
@@ -52,7 +52,7 @@ const Footer = ({ siteInfo }) => {
       <div className='text-xs font-serif'>
         Powered By{' '}
         <a
-          href='https://github.com/tangly1024/NotionNext'
+          href='https://github.com/notionnext-org/NotionNext'
           className='underline text-gray-500 dark:text-gray-300'>
           NotionNext {siteConfig('VERSION')}
         </a>

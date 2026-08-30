@@ -10,7 +10,7 @@ import { useGlobal } from '@/lib/global'
 import { loadWowJS } from '@/lib/plugins/wow'
 import { isBrowser } from '@/lib/utils'
 import dynamic from 'next/dynamic'
-import Link from 'next/link'
+import SmartLink from '@/components/SmartLink'
 import { useRouter } from 'next/router'
 import { createContext, useContext, useEffect, useRef } from 'react'
 import Announcement from './components/Announcement'
@@ -29,6 +29,7 @@ import Header from './components/Header'
 import Hero from './components/Hero'
 import JumpToCommentButton from './components/JumpToCommentButton'
 import PostHero from './components/PostHero'
+import ReadingHome from './components/ReadingHome'
 import RightFloatButtons from './components/RightFloatButtons'
 import SearchNave from './components/SearchNav'
 import TagItemMiddle from './components/TagItemMiddle'
@@ -133,6 +134,9 @@ const LayoutBase = props => {
  * @returns
  */
 const LayoutIndex = props => {
+  if (siteConfig('MATERY_HOME_READING_LAYOUT', null, CONFIG)) {
+    return <ReadingHome {...props} />
+  }
   return <LayoutPostList {...props} />
 }
 
@@ -225,6 +229,7 @@ const LayoutSlug = props => {
   const { post, lock, validPassword } = props
   const { fullWidth } = useGlobal()
   const router = useRouter()
+  const waiting404 = siteConfig('POST_WAITING_TIME_FOR_404') * 1000
   useEffect(() => {
     // 404
     if (!post) {
@@ -239,7 +244,7 @@ const LayoutSlug = props => {
             }
           }
         },
-        siteConfig('POST_WAITING_TIME_FOR_404') * 1000
+        waiting404
       )
     }
   }, [post])
@@ -258,7 +263,7 @@ const LayoutSlug = props => {
               {/* 文章信息 */}
               {post?.type && post?.type === 'Post' && (
                 <>
-                  <div data-wow-delay='.2s' className='wow fadeInUp px-10'>
+                  <div data-wow-delay='.2s' className='wow fadeInUp px-2 sm:px-6 lg:px-10'>
                     <ArticleInfo post={post} />
                   </div>
                   <hr />
@@ -266,7 +271,7 @@ const LayoutSlug = props => {
               )}
 
               <div className='lg:px-10 subpixel-antialiased'>
-                <article id='article-wrapper' itemScope>
+                <article id='article-wrapper'>
                   {/* Notion文章主体 */}
                   <section
                     data-wow-delay='.1s'
@@ -358,7 +363,7 @@ const LayoutCategoryIndex = props => {
         <div className='flex justify-center flex-wrap'>
           {categoryOptions?.map(e => {
             return (
-              <Link
+              <SmartLink
                 key={e.name}
                 href={`/category/${e.name}`}
                 passHref
@@ -366,7 +371,7 @@ const LayoutCategoryIndex = props => {
                 <div className='duration-300 text-md whitespace-nowrap dark:hover:text-white px-5 cursor-pointer py-2 hover:text-indigo-400'>
                   <i className={'mr-4 fas fa-folder'} /> {e.name}({e.count})
                 </div>
-              </Link>
+              </SmartLink>
             )
           })}
         </div>

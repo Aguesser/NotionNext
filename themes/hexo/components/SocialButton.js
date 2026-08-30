@@ -1,6 +1,7 @@
 import QrCode from '@/components/QrCode'
 import { siteConfig } from '@/lib/config'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { handleEmailClick } from '@/lib/plugins/mailEncrypt'
 
 /**
  * 社交联系方式按钮组
@@ -13,6 +14,7 @@ const SocialButton = () => {
   const CONTACT_TELEGRAM = siteConfig('CONTACT_TELEGRAM')
 
   const CONTACT_LINKEDIN = siteConfig('CONTACT_LINKEDIN')
+  const CONTACT_ORCID = siteConfig('CONTACT_ORCID')
   const CONTACT_WEIBO = siteConfig('CONTACT_WEIBO')
   const CONTACT_INSTAGRAM = siteConfig('CONTACT_INSTAGRAM')
   const CONTACT_EMAIL = siteConfig('CONTACT_EMAIL')
@@ -32,6 +34,9 @@ const SocialButton = () => {
   const closePopover = () => {
     setQrCodeShow(false)
   }
+
+  const emailIcon = useRef(null)
+
   return (
     <div className='w-full justify-center flex-wrap flex'>
       <div className='space-x-3 text-xl flex items-center text-gray-600 dark:text-gray-300 '>
@@ -71,6 +76,16 @@ const SocialButton = () => {
             <i className='transform hover:scale-125 duration-150 fab fa-linkedin dark:hover:text-indigo-400 hover:text-indigo-600' />
           </a>
         )}
+        {CONTACT_ORCID && (
+          <a
+            target='_blank'
+            rel='noreferrer'
+            href={CONTACT_ORCID}
+            title={'ORCID'}>
+            <i className='transform hover:scale-125 duration-150 fab fa-orcid dark:hover:text-indigo-400 hover:text-indigo-600' />
+          </a>
+        )}
+
         {CONTACT_WEIBO && (
           <a
             target='_blank'
@@ -91,10 +106,10 @@ const SocialButton = () => {
         )}
         {CONTACT_EMAIL && (
           <a
-            target='_blank'
-            rel='noreferrer'
-            title={'email'}
-            href={`mailto:${CONTACT_EMAIL}`}>
+            onClick={e => handleEmailClick(e, emailIcon, CONTACT_EMAIL)}
+            title='email'
+            className='cursor-pointer'
+            ref={emailIcon}>
             <i className='transform hover:scale-125 duration-150 fas fa-envelope dark:hover:text-indigo-400 hover:text-indigo-600' />
           </a>
         )}

@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import SmartLink from '@/components/SmartLink'
 import { useRouter } from 'next/router'
 
 export const MenuItemPCNormal = props => {
@@ -10,7 +10,7 @@ export const MenuItemPCNormal = props => {
   }
 
   return (
-    <Link
+    <SmartLink
       key={`${link.id}-${link.href}`}
       title={link.href}
       href={link.href}
@@ -18,13 +18,13 @@ export const MenuItemPCNormal = props => {
         'px-2 duration-300 text-sm justify-between dark:text-gray-300 cursor-pointer flex flex-nowrap items-center ' +
         (selected
           ? 'bg-gray-600 text-white hover:text-white'
-          : 'hover:text-gray-600')
+          : 'hover:text-gray-600 dark:hover:text-white')
       }>
       <div className='items-center justify-center flex '>
         <i className={link.icon} />
         <div className='ml-2 whitespace-nowrap'>{link.name}</div>
       </div>
       {link.slot}
-    </Link>
+    </SmartLink>
   )
 }

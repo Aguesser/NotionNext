@@ -7,7 +7,7 @@ import { siteConfig } from '@/lib/config'
 import { useGlobal } from '@/lib/global'
 import { isBrowser, scanAndConvertToLinks } from '@/lib/utils'
 import { Transition } from '@headlessui/react'
-import Link from 'next/link'
+import SmartLink from '@/components/SmartLink'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 import { ArticleLock } from './components/ArticleLock'
@@ -273,10 +273,7 @@ const LayoutSlug = props => {
 
             <hr className='border-2 border-[#D2232A]' />
 
-            <article
-              itemScope
-              itemType='https://schema.org/Movie'
-              className='subpixel-antialiased overflow-y-hidden'>
+            <article className='subpixel-antialiased overflow-y-hidden'>
               {/* Notion文章主体 */}
               <section className='px-5 justify-center mx-auto max-w-2xl lg:max-w-full'>
                 {post && <NotionPage post={post} />}
@@ -346,7 +343,7 @@ const LayoutCategoryIndex = props => {
         <div id='category-list' className='duration-200 flex flex-wrap mx-8'>
           {categoryOptions?.map(category => {
             return (
-              <Link
+              <SmartLink
                 key={category.name}
                 href={`/category/${category.name}`}
                 passHref
@@ -358,7 +355,7 @@ const LayoutCategoryIndex = props => {
                   <i className='mr-4 fas fa-folder' /> {category.name}(
                   {category.count})
                 </div>
-              </Link>
+              </SmartLink>
             )
           })}
         </div>

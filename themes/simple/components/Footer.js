@@ -1,3 +1,4 @@
+import AnalyticsBusuanzi from '@/components/AnalyticsBusuanzi'
 import { BeiAnGongAn } from '@/components/BeiAnGongAn'
 import DarkModeButton from '@/components/DarkModeButton'
 import { siteConfig } from '@/lib/config'
@@ -11,6 +12,7 @@ export default function Footer(props) {
   const d = new Date()
   const currentYear = d.getFullYear()
   const since = siteConfig('SINCE')
+  const ANALYTICS_BUSUANZI_ENABLE = siteConfig('ANALYTICS_BUSUANZI_ENABLE')
   const copyrightDate =
     parseInt(since) < currentYear ? since + '-' + currentYear : currentYear
 
@@ -28,16 +30,21 @@ export default function Footer(props) {
           {/* <a href="#" className="text-black no-underline hover:underline">Privacy Policy</a> */}
           {siteConfig('BEI_AN') && (
             <a
-              href='https://beian.miit.gov.cn/'
-              className='text-black dark:text-gray-200 no-underline hover:underline ml-4'>
+              href={siteConfig('BEI_AN_LINK')}
+              className='no-underline hover:underline ml-4'>
               {siteConfig('BEI_AN')}
             </a>
           )}
           <BeiAnGongAn />
+          {ANALYTICS_BUSUANZI_ENABLE && (
+            <div className='inline-flex ml-4'>
+              <AnalyticsBusuanzi />
+            </div>
+          )}
           <span className='no-underline ml-4'>
             Powered by
             <a
-              href='https://github.com/tangly1024/NotionNext'
+              href='https://github.com/notionnext-org/NotionNext'
               className=' hover:underline'>
               NotionNext {siteConfig('VERSION')}
             </a>

@@ -1,8 +1,9 @@
 import BLOG from '@/blog.config'
 import { getDataFromCache } from '@/lib/cache/cache_manager'
 import { siteConfig } from '@/lib/config'
-import { getGlobalData } from '@/lib/db/getSiteData'
+import { fetchGlobalAllData } from '@/lib/db/SiteDataApi'
 import { DynamicLayout } from '@/themes/theme'
+import { getPageBlockCacheKey } from '@/lib/db/notion/getPostBlocks'
 
 const Index = props => {
   const { keyword } = props
@@ -18,7 +19,7 @@ const Index = props => {
  * @returns
  */
 export async function getStaticProps({ params: { keyword, page }, locale }) {
-  const props = await getGlobalData({
+  const props = await fetchGlobalAllData({
     from: 'search-props',
     pageType: ['Post'],
     locale
@@ -50,9 +51,9 @@ export async function getStaticProps({ params: { keyword, page }, locale }) {
   }
 }
 
-export async function getStaticPaths() {
+export function getStaticPaths() {
   return {
-    paths: [{ params: { keyword: BLOG.TITLE, page: '1' } }],
+    paths: [{ params: { keyword: 'NotionNext', page: '1' } }],
     fallback: true
   }
 }
@@ -113,7 +114,7 @@ async function filterByMemCache(allPosts, keyword) {
     keyword = keyword.trim()
   }
   for (const post of allPosts) {
-    const cacheKey = 'page_block_' + post.id
+    const cacheKey = getPageBlockCacheKey(post.id, post.lastEditedDate)
     const page = await getDataFromCache(cacheKey, true)
     const tagContent =
       post?.tags && Array.isArray(post?.tags) ? post?.tags.join(' ') : ''
@@ -135,7 +136,7 @@ async function filterByMemCache(allPosts, keyword) {
     // console.log('全文搜索缓存', cacheKey, page != null)
     post.results = []
     let hitCount = 0
-    for (const i in indexContent) {
+    for (const i of indexContent) {
       const c = indexContent[i]
       if (!c) {
         continue
