@@ -5,7 +5,7 @@
   "homepage": "https://github.com/notionnext-org/NotionNext.git",
   "license": "MIT",
   "engines": {
-    "node": ">=22 <25"
+    "node": "24.x"
   },
   "repository": {
     "type": "git",

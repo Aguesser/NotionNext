@@ -193,7 +193,7 @@ cd NotionNext
 # 2.创建构建文件
 cat &gt; Dockerfile &lt;&lt;EOF
 # 第一阶段：基础镜像
-FROM swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/library/node:22-alpine AS base
+FROM swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/library/node:24-alpine AS base
 
 # 第二阶段：依赖安装
 FROM base AS deps
@@ -311,8 +311,8 @@ echo "source ~/.nvm/nvm.sh" &gt;&gt; ~/.bashrc
 # 2. 更新变量环境
 source ~/.bashrc
 
-# 3. 安装 nodejs ， 这里举例使用 Node 22（与官方 README 要求一致），其它版本请自行按需选择
-nvm install 22
+# 3. 安装 nodejs ， 这里举例使用 Node 24（与官方 README 要求一致），其它版本请自行按需选择
+nvm install 24
 ```
 ::: tip 提示
 题外话：

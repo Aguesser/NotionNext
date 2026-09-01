@@ -1,3 +1,9 @@
+// 英雄区滚动图标：用 emoji 生成的 SVG 图标，无需外部图片资源
+const emojiIcon = emoji =>
+  `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="0.9em" font-size="88">${emoji}</text></svg>`
+  )}`
+
 const CONFIG = {
   HEO_HOME_POST_TWO_COLS: true, // 首页博客两列显示，若为false则只显示一列
   HEO_LOADING_COVER: true, // 页面加载的遮罩动画
@@ -5,7 +11,6 @@ const CONFIG = {
   HEO_HOME_BANNER_ENABLE: true,
 
   HEO_INFO_CARD_AVATAR_BLUR: true, // 文章详情页个人资料卡头像样式。true：显示为模糊装饰头像；false：与首页头像保持一致
-
   HEO_COLOR_PRIMARY: '#4f65f0',
   HEO_COLOR_PRIMARY_HOVER: '#4f46e5',
   HEO_COLOR_PRIMARY_TEXT: '#ffffff',
@@ -24,8 +29,8 @@ const CONFIG = {
 
   // 首页顶部通知条滚动内容，如不需要可以留空 []
   HEO_NOTICE_BAR: [
-    { title: '欢迎来到我的博客', url: 'https://blog.tangly1024.com' },
-    { title: '访问文档中心获取更多帮助', url: 'https://docs.tangly1024.com' }
+    { title: '欢迎来到 Aguesser 的学习小站', url: '/about' },
+    { title: '读书笔记与游戏设计思考，持续更新中', url: '/archive' }
   ],
 
   // 英雄区左右侧组件颠倒位置
@@ -44,12 +49,12 @@ const CONFIG = {
   HEO_HERO_COVER_TITLE: '随便逛逛',
 
   // 英雄区显示三个置顶分类
-  HEO_HERO_CATEGORY_1: { title: '必看精选', url: '/tag/必看精选' },
-  HEO_HERO_CATEGORY_2: { title: '热门文章', url: '/tag/热门文章' },
-  HEO_HERO_CATEGORY_3: { title: '实用教程', url: '/tag/实用教程' },
+  HEO_HERO_CATEGORY_1: { title: '游戏设计', url: '/category/游戏设计' },
+  HEO_HERO_CATEGORY_2: { title: '读书笔记', url: '/category/读书笔记' },
+  HEO_HERO_CATEGORY_3: { title: '全部文章', url: '/archive' },
 
   // 英雄区右侧推荐文章标签, 例如 [推荐] , 最多六篇文章; 若留空白''，则推荐最近更新文章
-  HEO_HERO_RECOMMEND_POST_TAG: '推荐',
+  HEO_HERO_RECOMMEND_POST_TAG: '',
   HEO_HERO_RECOMMEND_POST_SORT_BY_UPDATE_TIME: false, // 推荐文章排序，为`true`时将强制按最后修改时间倒序
   //   HERO_RECOMMEND_COVER: 'https://cdn.pixabay.com/photo/2015/10/30/20/13/sunrise-1014712_1280.jpg', // 英雄区右侧图片
 
@@ -59,88 +64,86 @@ const CONFIG = {
   // 右侧个人资料卡牌欢迎语，点击可自动切换
   HEO_INFOCARD_GREETINGS: [
     '你好！我是',
-    '🔍 分享与热心帮助',
-    '🤝 专修交互与设计',
-    '🏃 脚踏实地行动派',
-    '🏠 智能家居小能手',
-    '🤖️ 数码科技爱好者',
-    '🧱 团队小组发动机'
+    '📚 读书笔记整理中',
+    '🎮 游戏设计思考',
+    '🧠 心理学爱好者',
+    '✍️ 持续学习与记录'
   ],
 
   // 个人资料底部按钮
   HEO_INFO_CARD_URL1: '/about',
   HEO_INFO_CARD_ICON1: 'fas fa-user',
-  HEO_INFO_CARD_URL2: 'https://github.com/tangly1024',
+  HEO_INFO_CARD_URL2: 'https://github.com/Aguesser',
   HEO_INFO_CARD_ICON2: 'fab fa-github',
   HEO_INFO_CARD_ICON_ORCID: 'fab fa-orcid',
-  HEO_INFO_CARD_URL3: 'https://www.tangly1024.com',
-  HEO_INFO_CARD_TEXT3: '了解更多',
+  HEO_INFO_CARD_URL3: '/archive',
+  HEO_INFO_CARD_TEXT3: '往期整理',
 
-  // 用户技能图标
+  // 用户技能图标（英雄区 banner 斜向滚动展示）
   HEO_GROUP_ICONS: [
     {
-      title_1: 'AfterEffect',
-      img_1: '/images/heo/20239df3f66615b532ce571eac6d14ff21cf072602.webp',
-      color_1: '#989bf8',
-      title_2: 'Sketch',
-      img_2: '/images/heo/2023e0ded7b724a39f12d59c3dc8fbdc7cbe074202.webp',
-      color_2: '#ffffff'
+      title_1: '游戏设计',
+      img_1: emojiIcon('🎮'),
+      color_1: '#4f65f0',
+      title_2: '读书笔记',
+      img_2: emojiIcon('📚'),
+      color_2: '#dca846'
     },
     {
-      title_1: 'Docker',
-      img_1: '/images/heo/20231108a540b2862d26f8850172e4ea58ed075102.webp',
-      color_1: '#57b6e6',
-      title_2: 'Photoshop',
-      img_2: '/images/heo/2023e4058a91608ea41751c4f102b131f267075902.webp',
-      color_2: '#4082c3'
+      title_1: '心理学',
+      img_1: emojiIcon('🧠'),
+      color_1: '#e05e7a',
+      title_2: '游戏为什么好玩',
+      img_2: emojiIcon('🕹️'),
+      color_2: '#2f9e8f'
     },
     {
-      title_1: 'FinalCutPro',
-      img_1: '/images/heo/20233e777652412247dd57fd9b48cf997c01070702.webp',
-      color_1: '#ffffff',
-      title_2: 'Python',
-      img_2: '/images/heo/20235c0731cd4c0c95fc136a8db961fdf963071502.webp',
-      color_2: '#ffffff'
+      title_1: '原子习惯',
+      img_1: emojiIcon('🌱'),
+      color_1: '#5a9e5f',
+      title_2: '存在主义',
+      img_2: emojiIcon('🌌'),
+      color_2: '#46579e'
     },
     {
-      title_1: 'Swift',
-      img_1: '/images/heo/202328bbee0b314297917b327df4a704db5c072402.webp',
-      color_1: '#eb6840',
-      title_2: 'Principle',
-      img_2: '/images/heo/2023f76570d2770c8e84801f7e107cd911b5073202.webp',
+      title_1: '心流',
+      img_1: emojiIcon('🌊'),
+      color_1: '#3f8fce',
+      title_2: '教育',
+      img_2: emojiIcon('🎓'),
       color_2: '#8f55ba'
     },
     {
-      title_1: 'illustrator',
-      img_1: '/images/heo/20237359d71b45ab77829cee5972e36f8c30073902.webp',
-      color_1: '#f29e39',
-      title_2: 'CSS3',
-      img_2: '/images/heo/20237c548846044a20dad68a13c0f0e1502f074602.webp',
-      color_2: '#2c51db'
+      title_1: '独立游戏',
+      img_1: emojiIcon('👾'),
+      color_1: '#7a5cd6',
+      title_2: '桌游与机制',
+      img_2: emojiIcon('🎲'),
+      color_2: '#d67a3f'
     },
     {
-      title_1: 'JS',
-      img_1: '/images/heo/2023786e7fc488f453d5fb2be760c96185c0075502.webp',
-      color_1: '#f7cb4f',
-      title_2: 'HTML',
-      img_2: '/images/heo/202372b4d760fd8a497d442140c295655426070302.webp',
-      color_2: '#e9572b'
+      title_1: '叙事设计',
+      img_1: emojiIcon('📖'),
+      color_1: '#c25e5e',
+      title_2: '写作',
+      img_2: emojiIcon('✍️'),
+      color_2: '#4a7fb5'
     },
     {
-      title_1: 'Git',
-      img_1: '/images/heo/2023ffa5707c4e25b6beb3e6a3d286ede4c6071102.webp',
-      color_1: '#df5b40',
-      title_2: 'Rhino',
-      img_2: '/images/heo/20231ca53fa0b09a3ff1df89acd7515e9516173302.webp',
-      color_2: '#1f1f1f'
+      title_1: '思考',
+      img_1: emojiIcon('💭'),
+      color_1: '#b58fd6',
+      title_2: '记录',
+      img_2: emojiIcon('🗂️'),
+      color_2: '#5f8f8a'
     }
   ],
 
   HEO_SOCIAL_CARD: true, // 是否显示右侧，点击加入社群按钮
-  HEO_SOCIAL_CARD_TITLE_1: '交流频道',
-  HEO_SOCIAL_CARD_TITLE_2: '加入我们的社群讨论分享',
-  HEO_SOCIAL_CARD_TITLE_3: '点击加入社群',
-  HEO_SOCIAL_CARD_URL: 'https://docs.tangly1024.com/article/how-to-question',
+  HEO_SOCIAL_CARD_TITLE_1: '一起交流',
+  HEO_SOCIAL_CARD_TITLE_2: '关于游戏、书籍与心理学的思考',
+  HEO_SOCIAL_CARD_TITLE_3: '了解本站',
+  HEO_SOCIAL_CARD_URL: '/about',
 
   // 底部统计面板文案
   HEO_POST_COUNT_TITLE: '文章数:',
@@ -157,7 +160,7 @@ const CONFIG = {
   HEO_MENU_SEARCH: true, // 显示搜索
 
   HEO_POST_LIST_COVER: true, // 列表显示文章封面
-  HEO_POST_LIST_COVER_HOVER_ENLARGE: false, // 列表鼠标悬停放大
+  HEO_POST_LIST_COVER_HOVER_ENLARGE: true, // 列表鼠标悬停放大
 
   HEO_POST_LIST_COVER_DEFAULT: true, // 封面为空时用站点背景做默认封面
   HEO_POST_LIST_SUMMARY: true, // 文章摘要
