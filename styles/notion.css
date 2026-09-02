@@ -88,7 +88,7 @@ html.dark {
 .notion {
   /* 文章正文字号：略大于全局基准，长文阅读更舒适 */
   font-size: 17.5px;
-  line-height: 1.75;
+  line-height: 1.65;
   color: var(--fg-color);
   caret-color: var(--fg-color);
   font-family: inherit !important;
