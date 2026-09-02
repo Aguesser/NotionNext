@@ -4,6 +4,15 @@
 
 html {
   overflow-x: hidden;
+  /* 整体字号基准：调大 Tailwind 所有 rem 单位的字号（默认 16px） */
+  font-size: 17px;
+}
+
+/* 移动端屏幕小，字号略收敛 */
+@media (max-width: 640px) {
+  html {
+    font-size: 16px;
+  }
 }
 
 .wrapper {
