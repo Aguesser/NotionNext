@@ -16,9 +16,9 @@ const Style = () => {
         --heo-color-accent: #ca8a04;
         --heo-color-bg: #f7f9fe;
         --heo-color-bg-dark: #18171d;
-        --heo-color-card: #ffffff;
-        --heo-color-card-dark: #1e1e1e;
-        --heo-color-card-muted: #f1f3f8;
+        --heo-color-card: rgba(255, 255, 255, 0.62);
+        --heo-color-card-dark: rgba(30, 30, 34, 0.6);
+        --heo-color-card-muted: rgba(241, 243, 248, 0.7);
         --heo-color-border: #4f46e5;
         --heo-color-border-dark: #ca8a04;
         --heo-color-text-light: #000000;
@@ -28,6 +28,18 @@ const Style = () => {
         --heo-color-text: var(--heo-color-text-light);
         --heo-color-text-secondary: var(--heo-color-text-secondary-light);
         background-color: var(--heo-color-bg);
+        /* 浅色：淡蓝天空渐变 + 细噪点，云朵由 SkyBackground 组件渲染 */
+        background-image:
+          linear-gradient(
+            180deg,
+            #a9d3f5 0%,
+            #c8e4fa 20%,
+            #e8f2fc 48%,
+            #f7f9fe 78%,
+            #f7f9fe 100%
+          ),
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+        background-attachment: fixed;
         color: var(--heo-color-text);
       }
 
@@ -35,27 +47,126 @@ const Style = () => {
         --heo-color-text: var(--heo-color-text-dark);
         --heo-color-text-secondary: var(--heo-color-text-secondary-dark);
         background-color: var(--heo-color-bg-dark);
+        /* 深色：夜晚星空渐变 + 细噪点，星星由 SkyBackground 组件渲染 */
+        background-image:
+          linear-gradient(
+            180deg,
+            #090d20 0%,
+            #0e1322 38%,
+            #161822 68%,
+            #18171d 100%
+          ),
+          url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+        background-attachment: fixed;
       }
 
-      html:not(.dark) #theme-heo .bg-white {
-        background-color: var(--heo-color-card);
+      /* iOS Safari 不支持 background-attachment: fixed，小屏直接跟随滚动避免渲染异常 */
+      @media (max-width: 767px) {
+        #theme-heo,
+        .dark #theme-heo {
+          background-attachment: scroll;
+        }
       }
 
-      .dark #theme-heo .dark\:bg-\[\#18171d\] {
-        background-color: var(--heo-color-bg-dark);
+      /* ===== 全站动态天空背景（SkyBackground 组件） ===== */
+      .heo-sky {
+        position: fixed;
+        inset: 0;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: 0;
+        display: none;
+      }
+      html:not(.dark) .heo-sky-light {
+        display: block;
+      }
+      html.dark .heo-sky-dark {
+        display: block;
       }
 
-      .dark #theme-heo .dark\:bg-\[\#1e1e1e\] {
-        background-color: var(--heo-color-card-dark);
+      /* 云朵：CSS 绘制的软边形状，横向匀速漂移 */
+      .heo-cloud {
+        position: absolute;
+        left: -280px;
+        width: 190px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 999px;
+        filter: blur(2px);
+        box-shadow: 0 8px 24px rgba(120, 150, 200, 0.12);
+        animation-name: heo-cloud-drift;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        will-change: transform;
+      }
+      .heo-cloud::before,
+      .heo-cloud::after {
+        content: '';
+        position: absolute;
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 50%;
+      }
+      .heo-cloud::before {
+        top: -30px;
+        left: 34px;
+        width: 74px;
+        height: 74px;
+      }
+      .heo-cloud::after {
+        top: -18px;
+        right: 30px;
+        width: 52px;
+        height: 52px;
+      }
+      @keyframes heo-cloud-drift {
+        from {
+          transform: translateX(0) scale(var(--s, 1));
+        }
+        to {
+          transform: translateX(calc(100vw + 640px)) scale(var(--s, 1));
+        }
       }
 
-      #theme-heo .bg-\[\#4f65f0\] {
-        background-color: var(--heo-color-primary);
+      /* 星光：小圆点缓慢闪烁 */
+      .heo-star {
+        position: absolute;
+        background: #ffffff;
+        border-radius: 50%;
+        box-shadow: 0 0 6px rgba(255, 255, 255, 0.85);
+        animation-name: heo-star-twinkle;
+        animation-timing-function: ease-in-out;
+        animation-iteration-count: infinite;
+        will-change: opacity, transform;
+      }
+      .heo-star-bright {
+        width: 4px;
+        height: 4px;
+        box-shadow:
+          0 0 10px 2px rgba(255, 255, 255, 0.55),
+          0 0 22px 4px rgba(160, 190, 255, 0.3);
+      }
+      @keyframes heo-star-twinkle {
+        0%,
+        100% {
+          opacity: 0.15;
+          transform: scale(0.75);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1.25);
+        }
       }
 
-      #theme-heo .bg-\[\#f1f3f8\] {
-        background-color: var(--heo-color-card-muted);
+      /* 尊重系统减弱动效设置 */
+      @media (prefers-reduced-motion: reduce) {
+        .heo-cloud,
+        .heo-star {
+          animation: none;
+        }
       }
+
+      /* 注意：带 Tailwind 任意值/冒号的转义类名选择器（如 .bg-white、.dark\:bg-\[\#1e1e1e\]）
+         在 styled-jsx 中不生效，卡片半透明磨砂规则已移至 styles/globals.css */
 
       #theme-heo .bg-indigo-600,
       #theme-heo .hover\:bg-indigo-600:hover {

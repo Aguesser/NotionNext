@@ -308,3 +308,39 @@ img {
   @keyframes l1 {
   0% {background-position: right}
 }
+
+/* ===== heo 主题：卡片底板半透明磨砂，透出天空背景 =====
+   注意：这类带 Tailwind 转义类名的选择器在 styled-jsx 中不生效，必须写在普通 CSS 里 */
+html:not(.dark) #theme-heo .bg-white,
+html:not(.dark) #theme-heo .bg-\[var\(--heo-color-card\)\] {
+  background-color: var(--heo-color-card);
+  backdrop-filter: blur(10px) saturate(1.05);
+  -webkit-backdrop-filter: blur(10px) saturate(1.05);
+}
+
+.dark #theme-heo .dark\:bg-\[\#1e1e1e\],
+.dark #theme-heo .dark\:bg-black,
+.dark #theme-heo .dark\:bg-\[\#1B1C20\],
+.dark #theme-heo .dark\:bg-\[var\(--heo-color-card-dark\)\] {
+  background-color: var(--heo-color-card-dark);
+  backdrop-filter: blur(10px) saturate(1.05);
+  -webkit-backdrop-filter: blur(10px) saturate(1.05);
+}
+
+#theme-heo .bg-\[\#f1f3f8\] {
+  background-color: var(--heo-color-card-muted);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* 移动端关闭磨砂滤镜，节省性能 */
+@media (max-width: 767px) {
+  #theme-heo .bg-white,
+  #theme-heo .dark\:bg-\[\#1e1e1e\],
+  #theme-heo .dark\:bg-black,
+  #theme-heo .bg-\[\#f1f3f8\],
+  #theme-heo .bg-\[var\(--heo-color-card\)\] {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
