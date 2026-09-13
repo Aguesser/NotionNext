@@ -12,6 +12,14 @@ module.exports = {
     'https://cdn.jsdelivr.net/npm/live2d-widget-model-wanko@1.0.5/assets/wanko.model.json', // 挂件模型地址 @see https://github.com/xiazeyu/live2d-widget-models
   WIDGET_PET_SWITCH_THEME:
     process.env.NEXT_PUBLIC_WIDGET_PET_SWITCH_THEME || false, // 点击宠物挂件切换博客主题（主题已瘦身至 heo，保留切换会跳到 example 演示主题）
+  WIDGET_PET_TIPS: [
+    '喵？找我有什么事吗~',
+    '戳我一下，好运加倍！',
+    '按住我可以拖着到处逛哦',
+    '双击我会回到角落休息',
+    '今天也要元气满满！',
+    '别忘了看看新文章~'
+  ], // 单击宠物时的随机气泡文案；设为空数组 [] 可关闭气泡
 
   SPOILER_TEXT_TAG: process.env.NEXT_PUBLIC_SPOILER_TEXT_TAG || '', // Spoiler文本隐藏功能，如Notion中 [sp]希望被spoiler的文字[sp]，填入[sp] 即可
 
