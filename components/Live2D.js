@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 
 /**
  * 网页动画宠物挂件
- * 悬浮于右下角，支持：按住拖动（松手自动收进屏幕）、单击弹跳+随机气泡、双击回到初始位置
+ * 悬浮于右下角，支持：按住拖动（松手自动收进屏幕）、单击冒气泡+触发模型内置动作（只有狗动、碗不动）、双击回到初始位置
  * @returns
  */
 export default function Live2D() {
@@ -21,7 +21,6 @@ export default function Live2D() {
   const floatRef = useRef(null)
   // 记录按下位置与时间，用于区分「拖拽」和「点击」
   const pressRef = useRef(null)
-  const bounceRef = useRef(null)
   const bubbleTimerRef = useRef(null)
   const [bubble, setBubble] = useState(null)
 
@@ -55,15 +54,6 @@ export default function Live2D() {
     bubbleTimerRef.current = setTimeout(() => setBubble(null), 2400)
   }
 
-  /** 弹跳动画：先移除再强制重排，保证连续点击也能重新触发 */
-  function playBounce() {
-    const el = bounceRef.current
-    if (!el) return
-    el.classList.remove('pet-bounce')
-    void el.offsetWidth
-    el.classList.add('pet-bounce')
-  }
-
   function handlePressStart(e) {
     const point = e.touches?.[0] || e
     pressRef.current = {
@@ -87,7 +77,6 @@ export default function Live2D() {
       switchTheme()
       return
     }
-    playBounce()
     if (petTips.length > 0) {
       showBubble(petTips[Math.floor(Math.random() * petTips.length)])
     }
@@ -120,19 +109,17 @@ export default function Live2D() {
             {bubble.text}
           </div>
         )}
-        <div ref={bounceRef} className='origin-bottom'>
-          <canvas
-            id='live2d'
-            width='280'
-            height='250'
-            className='cursor-grab touch-none active:cursor-grabbing'
-            onMouseDown={handlePressStart}
-            onMouseUp={handlePressEnd}
-            onTouchStart={handlePressStart}
-            onTouchEnd={handlePressEnd}
-            onDoubleClick={handleDoubleClick}
-          />
-        </div>
+        <canvas
+          id='live2d'
+          width='280'
+          height='250'
+          className='cursor-grab touch-none active:cursor-grabbing'
+          onMouseDown={handlePressStart}
+          onMouseUp={handlePressEnd}
+          onTouchStart={handlePressStart}
+          onTouchEnd={handlePressEnd}
+          onDoubleClick={handleDoubleClick}
+        />
       </div>
     </Draggable>
   )
