@@ -71,3 +71,6 @@ webpack-internal:/
 
 # Local Cloudflare Worker route configuration
 /cloudflare/notion-image-proxy/wrangler.toml
+
+# 本地主题备份目录（瘦身移出的主题）
+themes.disabled/
