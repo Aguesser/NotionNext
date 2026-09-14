@@ -97,6 +97,15 @@ export default function Live2D() {
     }
   }, [theme, showPet, petLink])
 
+  // 兜底：只要回到空闲态，就强制恢复狗与碗的显示，
+  // 避免任何异常路径（渲染停摆、抓帧失败、拖出窗口等）把狗留在隐藏状态
+  useEffect(() => {
+    if (phase === 'idle') {
+      setPartsOpacity(DOG_PART_IDS, 1)
+      setPartsOpacity(BOWL_PART_IDS, 1)
+    }
+  }, [phase])
+
   function getModel() {
     const proxy = window.__live2dProxy
     if (proxy && typeof proxy.getModel === 'function') {
@@ -250,7 +259,6 @@ export default function Live2D() {
         setPhaseBoth('dragging')
         const pos = pendingPosRef.current
         if (pos) moveGhost(pos.x, pos.y)
-        attachDragListeners()
         startStruggle() // 拎起来后进入「挣扎—停顿」循环
       }
       return
@@ -275,6 +283,8 @@ export default function Live2D() {
     window.addEventListener('mouseup', onDragEnd)
     window.addEventListener('touchmove', onDragMove, { passive: false })
     window.addEventListener('touchend', onDragEnd)
+    // 窗口失焦（切标签/拖出浏览器）也结束拖拽，避免卡在拖拽态
+    window.addEventListener('blur', onDragEnd)
   }
 
   function onDragMove(e) {
@@ -285,11 +295,21 @@ export default function Live2D() {
   }
 
   function onDragEnd() {
-    if (phaseRef.current !== 'dragging') return
-    window.removeEventListener('mousemove', onDragMove)
-    window.removeEventListener('mouseup', onDragEnd)
-    window.removeEventListener('touchmove', onDragMove)
-    window.removeEventListener('touchend', onDragEnd)
+    const cur = phaseRef.current
+    if (cur === 'preparing') {
+      // 空碗还没定格就松手：立刻中止并恢复显示，避免狗一直不见
+      detachDragListeners()
+      if (prepareGuardRef.current) {
+        clearTimeout(prepareGuardRef.current)
+        prepareGuardRef.current = null
+      }
+      setPartsOpacity(DOG_PART_IDS, 1)
+      setPartsOpacity(BOWL_PART_IDS, 1)
+      setPhaseBoth('idle')
+      return
+    }
+    if (cur !== 'dragging') return
+    detachDragListeners()
     stopStruggle()
     // 恢复全部部件（主画布先不显示，等「钻入消失」放完再蹦出来）
     setPartsOpacity(DOG_PART_IDS, 1)
@@ -303,16 +323,27 @@ export default function Live2D() {
       vanishTimerRef.current = setTimeout(() => {
         setPhaseBoth('idle')
       }, 520)
-    }, 420)
+    }, 460)
+  }
+
+  function detachDragListeners() {
+    window.removeEventListener('mousemove', onDragMove)
+    window.removeEventListener('mouseup', onDragEnd)
+    window.removeEventListener('touchmove', onDragMove)
+    window.removeEventListener('touchend', onDragEnd)
+    window.removeEventListener('blur', onDragEnd)
   }
 
   function startDrag(x, y) {
     pendingPosRef.current = { x, y }
+    // 监听器在 preparing 阶段就挂上：若空碗还没定格就松手，也能立刻中止
+    attachDragListeners()
     setPhaseBoth('preparing')
     // 隐藏狗部件 → 下一帧定格空碗（在 handleFrame 里继续切换）
     const ok = setPartsOpacity(DOG_PART_IDS, 0)
     if (!ok) {
       // 模型尚未就绪：退回空闲，不影响正常点击
+      detachDragListeners()
       setPhaseBoth('idle')
       return
     }
@@ -321,6 +352,7 @@ export default function Live2D() {
     prepareGuardRef.current = setTimeout(() => {
       prepareGuardRef.current = null
       if (phaseRef.current === 'preparing') {
+        detachDragListeners()
         setPartsOpacity(DOG_PART_IDS, 1)
         setPartsOpacity(BOWL_PART_IDS, 1)
         setPhaseBoth('idle')
