@@ -3,6 +3,7 @@ import { siteConfig } from '@/lib/config'
 import { useGlobal } from '@/lib/global'
 import { isMobile, loadExternalResource } from '@/lib/utils'
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 // wanko 模型是分部件渲染的（moc 里狗和碗是不同的 Parts），
 // 因此直接控制部件可见性，让渲染管线自己输出「完整空碗」和「完整狗」：
@@ -60,6 +61,16 @@ export default function Live2D() {
   const bubbleTimerRef = useRef(null)
   const vanishTimerRef = useRef(null)
   const [bubble, setBubble] = useState(null)
+  // 移动端不显示挂件（模型也不会加载）。放在 effect 里判断，避免服务端渲染时访问 navigator
+  const [hidePet, setHidePet] = useState(false)
+  // 挂件用 Portal 挂到 body 下：主题的侧栏容器是 hidden xl:block，
+  // 直接放在侧栏里会在窄窗口下被祖先的 display:none 连带隐藏
+  const [portalReady, setPortalReady] = useState(false)
+
+  useEffect(() => {
+    setHidePet(isMobile())
+    setPortalReady(true)
+  }, [])
 
   function setPhaseBoth(p) {
     phaseRef.current = p
@@ -405,10 +416,6 @@ export default function Live2D() {
     }
   }
 
-  if (!showPet) {
-    return <></>
-  }
-
   // preparing：主画布自身已是空碗（狗部件已隐藏），无需贴图
   // dragging ：主画布隐藏（只渲染狗），显示空碗定格图，幻影跟手
   // returning：幻影在掉落点「往下钻入」消失——此间主画布仍隐藏，碗保持空碗
@@ -426,8 +433,12 @@ export default function Live2D() {
     .filter(Boolean)
     .join(' ')
 
-  return (
-    <div className='fixed bottom-10 right-6 z-40 hidden select-none lg:block'>
+  if (!showPet || hidePet || !portalReady) {
+    return <></>
+  }
+
+  return createPortal(
+    <div className='fixed bottom-10 right-6 z-40 select-none'>
       {/* 气泡提示 */}
       {bubble && (
         <div
@@ -470,6 +481,7 @@ export default function Live2D() {
         className={ghostClass}
         style={{ display: showGhost ? 'block' : 'none' }}
       />
-    </div>
+    </div>,
+    document.body
   )
 }
