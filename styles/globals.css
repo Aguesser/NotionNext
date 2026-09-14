@@ -415,24 +415,39 @@ html:not(.dark) #theme-heo .bg-\[var\(--heo-color-card\)\] {
   transform: translateX(-50%) rotate(45deg);
 }
 
-/* 松手后：狗在掉落点「往下钻入」消失 */
-@keyframes pet-ghost-burrow {
+/* 松手后：狗在掉落点「往下钻入」消失
+   位移与透明度分成两个动画：位移全程只有一个加速段（关键帧边界不会重置速度），
+   避免下落中途出现顿挫；透明度在后段才淡出，让"快速坠落"看得清楚 */
+@keyframes pet-ghost-burrow-fall {
   0% {
-    opacity: 1;
     transform: translateY(0) scale(1, 1);
+    /* 下蹲：起步快、末尾放缓（ease-out） */
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.4, 1);
   }
-  30% {
+  18% {
+    transform: translateY(4px) scale(1.09, 0.82);
+    /* 下坠：起步慢、越落越快（ease-in），模拟重力加速度 */
+    animation-timing-function: cubic-bezier(0.5, 0, 0.95, 0.42);
+  }
+  100% {
+    transform: translateY(66px) scale(0.36, 0.22);
+  }
+}
+
+@keyframes pet-ghost-burrow-fade {
+  0%,
+  55% {
     opacity: 1;
-    transform: translateY(5px) scale(1.08, 0.82); /* 先下蹲蓄力 */
   }
   100% {
     opacity: 0;
-    transform: translateY(52px) scale(0.42, 0.3); /* 钻入地面 */
   }
 }
 
 .pet-ghost-burrow {
-  animation: pet-ghost-burrow 0.4s cubic-bezier(0.5, 0, 0.9, 0.6) forwards;
+  animation:
+    pet-ghost-burrow-fall 0.44s forwards,
+    pet-ghost-burrow-fade 0.44s linear forwards;
   transform-origin: 50% 92%;
 }
 
