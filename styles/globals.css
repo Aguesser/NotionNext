@@ -378,8 +378,7 @@ html:not(.dark) #theme-heo .bg-\[var\(--heo-color-card\)\] {
 
 /* ===== Live2D 宠物挂件交互 ===== */
 /* 点击反馈使用模型自带的 tap_body 动作（只动狗、碗不动），此处只负责气泡样式 */
-/* 气泡提示 */
-@keyframes pet-bubble-pop {
+/* 气泡提示 */@keyframes pet-bubble-pop {
   0% {
     opacity: 0;
     transform: translateX(-50%) translateY(6px) scale(0.85);
@@ -416,8 +415,28 @@ html:not(.dark) #theme-heo .bg-\[var\(--heo-color-card\)\] {
   transform: translateX(-50%) rotate(45deg);
 }
 
+/* 拖拽时被拎起来的狗：松手后在掉落点消散 */
+@keyframes pet-ghost-vanish {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.45) translateY(16px);
+  }
+}
+
+.pet-ghost-vanish {
+  animation: pet-ghost-vanish 0.3s ease-in forwards;
+  transform-origin: 50% 80%;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pet-bubble {
     animation: none;
+  }
+  .pet-ghost-vanish {
+    animation-duration: 0.01s;
   }
 }
