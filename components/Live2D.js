@@ -56,6 +56,7 @@ export default function Live2D() {
   const pressRef = useRef(null)
   const pendingPosRef = useRef(null)
   const prepareGuardRef = useRef(null)
+  const struggleTimerRef = useRef(null)
   const bubbleTimerRef = useRef(null)
   const vanishTimerRef = useRef(null)
   const [bubble, setBubble] = useState(null)
@@ -73,6 +74,15 @@ export default function Live2D() {
             hookContextForGhostCopy()
             // https://github.com/xiazeyu/live2d-widget-models
             loadlive2d('live2d', petLink)
+            // 预热挣扎动作，避免第一次拖拽时才有加载延迟
+            setTimeout(() => {
+              const wrapper = getWrapper()
+              if (wrapper) {
+                try {
+                  wrapper.preloadMotionGroup('shake')
+                } catch (e) {}
+              }
+            }, 1500)
           } catch (error) {
             console.error('读取PET模型', error)
           }
@@ -83,6 +93,7 @@ export default function Live2D() {
       if (bubbleTimerRef.current) clearTimeout(bubbleTimerRef.current)
       if (vanishTimerRef.current) clearTimeout(vanishTimerRef.current)
       if (prepareGuardRef.current) clearTimeout(prepareGuardRef.current)
+      if (struggleTimerRef.current) clearInterval(struggleTimerRef.current)
     }
   }, [theme, showPet, petLink])
 
@@ -96,6 +107,44 @@ export default function Live2D() {
       }
     }
     return null
+  }
+
+  /** 动作/表情 API 在包装层（LAppModel）上 */
+  function getWrapper() {
+    const proxy = window.__live2dProxy
+    if (proxy && typeof proxy.getModel === 'function') {
+      const wrapper = proxy.getModel(0)
+      if (wrapper && typeof wrapper.startRandomMotion === 'function') {
+        return wrapper
+      }
+    }
+    return null
+  }
+
+  /** 被拎着时不断挣扎：前一次 shake 播完立刻接下一次，握住期间持续不停 */
+  function startStruggle() {
+    const wrapper = getWrapper()
+    if (!wrapper) return
+    const tick = () => {
+      try {
+        const mm = wrapper.mainMotionManager
+        // idle 动作是循环播放的，isFinished() 几乎永远为 false，
+        // 因此改用优先级判断：当前动作优先级低于挣扎动作(3)时才重新触发
+        if (!mm || mm.currentPriority < 3) {
+          wrapper.startRandomMotion('shake', 3)
+        }
+      } catch (e) {}
+    }
+    tick()
+    if (struggleTimerRef.current) clearInterval(struggleTimerRef.current)
+    struggleTimerRef.current = setInterval(tick, 250)
+  }
+
+  function stopStruggle() {
+    if (struggleTimerRef.current) {
+      clearInterval(struggleTimerRef.current)
+      struggleTimerRef.current = null
+    }
   }
 
   /** 设置一组部件的可见性 */
@@ -181,6 +230,7 @@ export default function Live2D() {
         const pos = pendingPosRef.current
         if (pos) moveGhost(pos.x, pos.y)
         attachDragListeners()
+        startStruggle() // 被拎起来后开始挣扎
       }
       return
     }
@@ -220,6 +270,7 @@ export default function Live2D() {
     window.removeEventListener('touchmove', onDragMove)
     window.removeEventListener('touchend', onDragEnd)
     // 恢复全部部件，狗从碗里弹回来
+    stopStruggle()
     setPartsOpacity(DOG_PART_IDS, 1)
     setPartsOpacity(BOWL_PART_IDS, 1)
     setPhaseBoth('returning')
@@ -351,7 +402,11 @@ export default function Live2D() {
         ref={ghostRef}
         width={CANVAS_W}
         height={CANVAS_H}
-        className='pet-ghost pointer-events-none fixed z-50'
+        className={
+          phase === 'dragging'
+            ? 'pet-ghost pet-struggle pointer-events-none fixed z-50'
+            : 'pet-ghost pointer-events-none fixed z-50'
+        }
         style={{ display: showGhost ? 'block' : 'none' }}
       />
     </div>
