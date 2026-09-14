@@ -290,18 +290,20 @@ export default function Live2D() {
     window.removeEventListener('mouseup', onDragEnd)
     window.removeEventListener('touchmove', onDragMove)
     window.removeEventListener('touchend', onDragEnd)
-    // 恢复全部部件，狗从碗里弹回来
     stopStruggle()
+    // 恢复全部部件（主画布先不显示，等「钻入消失」放完再蹦出来）
     setPartsOpacity(DOG_PART_IDS, 1)
     setPartsOpacity(BOWL_PART_IDS, 1)
     setPhaseBoth('returning')
-    const ghost = ghostRef.current
-    if (ghost) ghost.classList.add('pet-ghost-vanish')
     if (vanishTimerRef.current) clearTimeout(vanishTimerRef.current)
+    // 第一段：狗在掉落点往下钻入消失（此间只有一个狗——正在钻入的幻影）
     vanishTimerRef.current = setTimeout(() => {
-      if (ghost) ghost.classList.remove('pet-ghost-vanish')
-      setPhaseBoth('idle')
-    }, 650)
+      // 第二段：空碗画面切回真实渲染，狗从碗里蹦出来
+      setPhaseBoth('appearing')
+      vanishTimerRef.current = setTimeout(() => {
+        setPhaseBoth('idle')
+      }, 520)
+    }, 420)
   }
 
   function startDrag(x, y) {
@@ -376,11 +378,21 @@ export default function Live2D() {
   }
 
   // preparing：主画布自身已是空碗（狗部件已隐藏），无需贴图
-  // dragging：主画布隐藏（只渲染狗），显示空碗定格图
-  // returning：主画布恢复显示并播放「从碗里弹回」动画，幻影在掉落点消散
-  const hideLiveCanvas = phase === 'preparing' || phase === 'dragging'
-  const showBowlSnapshot = phase === 'dragging'
+  // dragging ：主画布隐藏（只渲染狗），显示空碗定格图，幻影跟手
+  // returning：幻影在掉落点「往下钻入」消失——此间主画布仍隐藏，碗保持空碗
+  // appearing：空碗切回真实渲染，狗从碗里「蹦出来」——幻影此时已消失
+  const hideLiveCanvas =
+    phase === 'preparing' || phase === 'dragging' || phase === 'returning'
+  const showBowlSnapshot = phase === 'dragging' || phase === 'returning'
   const showGhost = phase === 'dragging' || phase === 'returning'
+  // 幻影的动画类由 phase 驱动（用 classList 手动加会被 React 重渲染覆盖）
+  const ghostClass = [
+    'pet-ghost pointer-events-none fixed z-50',
+    phase === 'dragging' ? 'pet-struggle' : '',
+    phase === 'returning' ? 'pet-ghost-burrow' : ''
+  ]
+    .filter(Boolean)
+    .join(' ')
 
   return (
     <div className='fixed bottom-10 right-6 z-40 hidden select-none lg:block'>
@@ -398,7 +410,7 @@ export default function Live2D() {
         width={CANVAS_W}
         height={CANVAS_H}
         className={
-          phase === 'returning'
+          phase === 'appearing'
             ? 'pet-appear cursor-grab touch-none'
             : 'cursor-grab touch-none active:cursor-grabbing'
         }
@@ -423,11 +435,7 @@ export default function Live2D() {
         ref={ghostRef}
         width={CANVAS_W}
         height={CANVAS_H}
-        className={
-          phase === 'dragging'
-            ? 'pet-ghost pet-struggle pointer-events-none fixed z-50'
-            : 'pet-ghost pointer-events-none fixed z-50'
-        }
+        className={ghostClass}
         style={{ display: showGhost ? 'block' : 'none' }}
       />
     </div>
