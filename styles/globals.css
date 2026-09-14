@@ -462,27 +462,47 @@ html:not(.dark) #theme-heo .bg-\[var\(--heo-color-card\)\] {
   transform-origin: 50% 82%;
 }
 
-/* 被拎起来时悬挂晃动的物理感（配合模型自带的 shake 动作） */
+/* 被拎起来时悬挂晃动的物理感（配合模型自带的 shake 动作）
+   5.5 秒一个周期：前 2.5 秒挣扎晃动，后 3 秒静止，与模型「挣扎一轮—停顿几秒」的节奏同步 */
 @keyframes pet-struggle {
   0% {
     transform: rotate(-2.5deg) translateY(0);
   }
-  25% {
+  5% {
     transform: rotate(2deg) translateY(-1px);
   }
-  50% {
+  9% {
     transform: rotate(-1.5deg) translateY(1px);
   }
-  75% {
+  14% {
     transform: rotate(2.5deg) translateY(-1px);
   }
-  100% {
+  18% {
     transform: rotate(-2.5deg) translateY(0);
+  }
+  23% {
+    transform: rotate(2deg) translateY(-1px);
+  }
+  27% {
+    transform: rotate(-2deg) translateY(1px);
+  }
+  32% {
+    transform: rotate(1.5deg) translateY(-1px);
+  }
+  36% {
+    transform: rotate(-1deg) translateY(0);
+  }
+  41% {
+    transform: rotate(0.5deg) translateY(0);
+  }
+  45%,
+  100% {
+    transform: rotate(0deg) translateY(0);
   }
 }
 
 .pet-struggle {
-  animation: pet-struggle 0.65s ease-in-out infinite;
+  animation: pet-struggle 5.5s ease-in-out infinite;
   transform-origin: 50% 6%;
 }
 

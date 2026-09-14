@@ -93,7 +93,7 @@ export default function Live2D() {
       if (bubbleTimerRef.current) clearTimeout(bubbleTimerRef.current)
       if (vanishTimerRef.current) clearTimeout(vanishTimerRef.current)
       if (prepareGuardRef.current) clearTimeout(prepareGuardRef.current)
-      if (struggleTimerRef.current) clearInterval(struggleTimerRef.current)
+      if (struggleTimerRef.current) clearTimeout(struggleTimerRef.current)
     }
   }, [theme, showPet, petLink])
 
@@ -121,28 +121,49 @@ export default function Live2D() {
     return null
   }
 
-  /** 被拎着时不断挣扎：前一次 shake 播完立刻接下一次，握住期间持续不停 */
+  /**
+   * 被拎着时的挣扎节奏：挣扎一轮（一次 shake 约 2.5 秒），
+   * 动作结束后停顿 3 秒，再来一轮；松手即停止
+   */
   function startStruggle() {
     const wrapper = getWrapper()
     if (!wrapper) return
-    const tick = () => {
+    const shake = () => {
       try {
-        const mm = wrapper.mainMotionManager
-        // idle 动作是循环播放的，isFinished() 几乎永远为 false，
-        // 因此改用优先级判断：当前动作优先级低于挣扎动作(3)时才重新触发
-        if (!mm || mm.currentPriority < 3) {
-          wrapper.startRandomMotion('shake', 3)
-        }
+        // PRIORITY_NORMAL=3：可打断 idle(1)，动作结束后自动回落
+        wrapper.startRandomMotion('shake', 3)
       } catch (e) {}
     }
+    let pauseUntil = 0
+    let started = false
+    const tick = () => {
+      if (phaseRef.current !== 'dragging') return
+      const mm = wrapper.mainMotionManager
+      if (mm && mm.currentPriority >= 3) {
+        // 正在挣扎：本轮结束后才开始计停顿
+        pauseUntil = 0
+        struggleTimerRef.current = setTimeout(tick, 200)
+        return
+      }
+      if (!started) {
+        // 拎起来的瞬间先挣扎一轮
+        started = true
+        shake()
+      } else if (!pauseUntil) {
+        // 刚结束一轮，开始 3 秒停顿
+        pauseUntil = Date.now() + 3000
+      } else if (Date.now() >= pauseUntil) {
+        pauseUntil = 0
+        shake()
+      }
+      struggleTimerRef.current = setTimeout(tick, 200)
+    }
     tick()
-    if (struggleTimerRef.current) clearInterval(struggleTimerRef.current)
-    struggleTimerRef.current = setInterval(tick, 250)
   }
 
   function stopStruggle() {
     if (struggleTimerRef.current) {
-      clearInterval(struggleTimerRef.current)
+      clearTimeout(struggleTimerRef.current)
       struggleTimerRef.current = null
     }
   }
@@ -230,7 +251,7 @@ export default function Live2D() {
         const pos = pendingPosRef.current
         if (pos) moveGhost(pos.x, pos.y)
         attachDragListeners()
-        startStruggle() // 被拎起来后开始挣扎
+        startStruggle() // 拎起来后进入「挣扎—停顿」循环
       }
       return
     }
