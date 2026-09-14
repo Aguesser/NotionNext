@@ -9,7 +9,7 @@ module.exports = {
   WIDGET_PET: process.env.NEXT_PUBLIC_WIDGET_PET || true, // 是否显示宠物挂件
   WIDGET_PET_LINK:
     process.env.NEXT_PUBLIC_WIDGET_PET_LINK ||
-    'https://cdn.jsdelivr.net/npm/live2d-widget-model-wanko@1.0.5/assets/wanko.model.json', // 挂件模型地址 @see https://github.com/xiazeyu/live2d-widget-models
+    '/live2d/wanko/wanko.model.json', // 挂件模型地址（已本地化到 public/live2d，不依赖 CDN）；也可换其他模型如 https://github.com/xiazeyu/live2d-widget-models
   WIDGET_PET_SWITCH_THEME:
     process.env.NEXT_PUBLIC_WIDGET_PET_SWITCH_THEME || false, // 点击宠物挂件切换博客主题（主题已瘦身至 heo，保留切换会跳到 example 演示主题）
   WIDGET_PET_TIPS: [
